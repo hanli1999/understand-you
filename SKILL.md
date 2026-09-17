@@ -1,9 +1,27 @@
 ---
 name: understand-you
-description: Use this skill whenever the user gives an instruction that is ambiguous, vague, multi-interpretable, or might miss the user's real intent — even if the user doesn't explicitly say "I want you to understand me" or "ask me for clarification". 16 MBTI-style virtual expert panels analyze the instruction through multiple rounds of Delphi method (anonymous voting, iteration, convergence) and finally use Nominal Group Technique (NGT) to decide on a single clarification question to ask the user. Triggers include: "帮我理解", "我想要...", "能不能...", ambiguous task descriptions, multi-domain requests, unclear priorities, conflicting requirements, "你自己看着办" 类型的模糊授权。
+description: ALWAYS invoke this skill whenever the user gives an instruction that is ambiguous, vague, multi-interpretable, or might miss the user's real intent — even when the user does NOT explicitly say "帮我理解" or "ask me for clarification". NEVER skip the multi-round Delphi voting just because the query looks short or simple. MANDATORY workflow: (1) Launch 16 MBTI-style virtual expert panels, (2) Run at least 3 rounds of Delphi method (anonymous voting + iteration + convergence), (3) If no consensus after 3 rounds, run up to 5 rounds, (4) Use Nominal Group Technique (NGT) to decide on ONE single clarification question to ask the user. Failure modes to AVOID: never give a direct answer without running the vote; never skip rounds "to save tokens"; never pretend consensus when split; never expose the entire voting process to the user (give them the final question only). Trigger phrases include: "帮我理解", "我想要...", "能不能...", "帮我做一下", "整理一下", "你自己看着办", "我想做一个X", "帮我写个X", or any instruction with 2+ reasonable interpretations, missing context, unclear priorities, or conflicting requirements. The user wants explicit multi-expert voting analysis, not a best-guess answer. This skill is for Claude Code.
 ---
 
 # 懂你意思（Understand You）
+
+## 🚨 CRITICAL: 必须严格执行的硬性要求
+
+<important if="this skill is invoked, or the user's input is ambiguous/vague">
+**YOU MUST EXECUTE THE FULL DELPHI WORKFLOW BELOW. NO SHORTCUTS.**
+
+This is the most important section of this skill. The following rules override any temptation to take shortcuts:
+
+1. **NEVER give a direct answer** to an ambiguous user input without first running the multi-round Delphi vote
+2. **ALWAYS run at least 3 rounds** of voting (Round 1 → Round 2 → Round 3)
+3. **ALWAYS show the 16 expert votes** with the required format
+4. **ALWAYS reach out for NGT** to decide ONE final clarification question
+5. **NEVER claim "指令清晰，无需投票"** unless the user gives a perfectly literal, single-interpretation command (e.g., "2+2等于几")
+6. **NEVER skip the 16-person panel** even for "simple" questions
+7. **NEVER expose the full voting process** in the final user-facing output (compress to: 共识 + 置信度 + 一个追问)
+
+If you are tempted to skip steps "to save tokens" — DO NOT. The user explicitly wants the deep analysis.
+</important>
 
 ## 概述
 
@@ -18,10 +36,23 @@ description: Use this skill whenever the user gives an instruction that is ambig
 - 后续动作不可逆（删除、发送、部署），需要确认意图
 - 用户表达不完整，缺少关键参数（时间、对象、风格、数量）
 
-❌ **不适合**：
-- 指令清晰明确，单一解读
-- 用户说"按我说的做"、"先这样"、"随便"
+❌ **不适合**（这些情况下你必须说"指令清晰，无需投票"）：
+- 指令清晰明确，单一解读（如 "2+2 等于几"）
+- 用户说"按我说的做"、"先这样"、"随便" — 这些是用户明确放弃决策的信号
 - 已经知道答案（重复询问浪费 token）
+- 算术 / 单位换算 / 简单翻译 / 单纯文件读取等可机械完成的指令
+
+## ⚠️ 反偷懒清单（明确禁止的事）
+
+执行此 skill 时，**严禁**：
+
+- ❌ 直接给"最可能意图"答案而不启动投票
+- ❌ 跳过 Delphi 任意一轮（至少 3 轮）
+- ❌ 在 16 票中捏造专家意见
+- ❌ 当用户指令模糊时说"指令清晰，无需投票"
+- ❌ 把完整投票过程暴露给用户（要压缩为：共识 + 置信度 + 一个追问）
+- ❌ 问用户"你想要 A 还是 B"这种预设答案的追问（NGT 应该是开放性的）
+- ❌ 投票后修改用户原意来迁就多数派观点（少数派必须记录）
 
 ---
 
